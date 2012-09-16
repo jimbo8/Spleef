@@ -1,0 +1,7 @@
+name: Spleef
+main: no.jckf.spleef.Spleef
+version: 1.0
+commands:
+   spleef:
+      description: Spleef management.
+      usage: /<command> <create/delete/start/list> [arena name]
