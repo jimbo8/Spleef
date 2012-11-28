@@ -34,8 +34,8 @@ public class Arena {
 	public void save() {
 		World world = min.getWorld();
 
-		for (int x = min.getBlockX(); x < max.getBlockX(); x++) {
-			for (int z = min.getBlockZ(); z < max.getBlockZ(); z++) {
+		for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
+			for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
 				Block b = world.getBlockAt(x,max.getBlockY(),z);
 				snapshot.put(b.getLocation(),b.getState());
 			}
