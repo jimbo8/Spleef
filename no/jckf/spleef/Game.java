@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ public class Game implements Listener {
 	private final Spleef plugin;
 	private final Arena arena;
 	private ArrayList<Player> players;
-	private int last = 0;
 
 	public Game(Spleef _plugin,Arena _arena) {
 		plugin = _plugin;
@@ -26,6 +24,30 @@ public class Game implements Listener {
 		players = new ArrayList<Player>();
 
 		plugin.getServer().getPluginManager().registerEvents(this,plugin);
+
+		plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin,new Runnable() {
+			public void run() {
+				// Clone to avoid concurrent modification.
+				for (Player p : (ArrayList<Player>)players.clone()) {
+					Location l = p.getLocation();
+					l.setY(l.getY() + 3);
+
+					if (arena.contains(l)) {
+						if (players.size() > 1) {
+							players.remove(p);
+							p.sendMessage(ChatColor.RED + "You lost!");
+							broadcast(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + " is out!");
+						}
+					}
+					if (players.size() == 1 && players.contains(p)) {
+						plugin.getServer().broadcastMessage(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + " just won a round of spleef!");
+						players.remove(p);
+
+						arena.restore();
+					}
+				}
+			}
+		},0,20);
 
 		start();
 	}
@@ -89,37 +111,6 @@ public class Game implements Listener {
 		}
 
 		block.setType(Material.AIR);
-	}
-
-	// TODO: PlayerMoveEvent is very resource heavy. Find a better solution!
-	@EventHandler
-	public void onMove(PlayerMoveEvent event) {
-		// Ugly hack to avoid a lot of work.
-		int now = (int) (System.currentTimeMillis() / 1000L);
-		if (last >= now) {
-			return;
-		}
-		last = now;
-
-		// Clone to avoid concurrent modification.
-		for (Player p : (ArrayList<Player>)players.clone()) {
-			Location l = p.getLocation();
-			l.setY(l.getY() + 3);
-
-			if (arena.contains(l)) {
-				if (players.size() > 1) {
-					players.remove(p);
-					p.sendMessage(ChatColor.RED + "You lost!");
-					broadcast(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + " is out!");
-				}
-			}
-			if (players.size() == 1 && players.contains(p)) {
-				plugin.getServer().broadcastMessage(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + " just won a round of spleef!");
-				players.remove(p);
-
-				arena.restore();
-			}
-		}
 	}
 
 	@EventHandler
