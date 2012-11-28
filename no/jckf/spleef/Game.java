@@ -1,5 +1,6 @@
 package no.jckf.spleef;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -63,27 +64,27 @@ public class Game implements Listener {
 	public void start() {
 		arena.save();
 
-		String list = "";
+		ArrayList<String> list = new ArrayList<>();
 		for (Player player : plugin.getServer().getOnlinePlayers()) {
 			Location l = player.getLocation();
 			l.setY(l.getY() - 2);
 
 			if (arena.contains(l)) {
 				players.add(player);
-				list += player.getDisplayName() + ", ";
+				list.add(player.getDisplayName());
 			}
 		}
 
-		broadcast(ChatColor.GREEN + "The game has started! Players: " + ChatColor.WHITE + list.substring(0,Math.max(0,list.length() - 2)));
+		broadcast(ChatColor.GREEN + "The game has started! Players: " + ChatColor.WHITE + StringUtils.join(list,", "));
 	}
 
 	public void stop() {
-		String list = "";
+		ArrayList<String> list = new ArrayList<>();
 		for (Player player : players) {
-			list += player.getDisplayName() + ", ";
+			list.add(player.getDisplayName());
 		}
 
-		broadcast(ChatColor.RED + "The game was stopped! Remaining players: " + ChatColor.WHITE + list.substring(0,Math.max(0,list.length() - 2)));
+		broadcast(ChatColor.RED + "The game was stopped! Remaining players: " + ChatColor.WHITE + StringUtils.join(list,", "));
 
 		arena.restore();
 	}
