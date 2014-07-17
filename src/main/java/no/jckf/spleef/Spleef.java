@@ -30,6 +30,8 @@ public class Spleef extends JavaPlugin {
 			return;
 		}
 
+        this.saveDefaultConfig();
+
 		this.loadData();
 
 		this.getCommand("spleef").setExecutor(new Commands(this));
