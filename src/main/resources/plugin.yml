@@ -1,0 +1,8 @@
+name: ${project.name}
+version: ${project.version}
+main: ${main.class}
+
+commands:
+   spleef:
+      description: Spleef management.
+      usage: /<command> [create/delete/start/list] [arena name]
