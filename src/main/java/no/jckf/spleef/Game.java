@@ -15,89 +15,69 @@ import java.util.ArrayList;
 
 public class Game implements Listener {
 	private final Spleef plugin;
+
 	private final Arena arena;
-	private ArrayList<Player> players;
+	public final ArrayList<Player> players;
 
-	public Game(Spleef _plugin,Arena _arena) {
-		plugin = _plugin;
-		arena = _arena;
+	public Game(Spleef plugin, Arena arena) {
+		this.plugin = plugin;
+		this.arena = arena;
 
-		players = new ArrayList<Player>();
+		this.players = new ArrayList<>();
 
-		plugin.getServer().getPluginManager().registerEvents(this,plugin);
+		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 
-		plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin,new Runnable() {
-			public void run() {
-				// Clone to avoid concurrent modification.
-				for (Player p : (ArrayList<Player>)players.clone()) {
-					Location l = p.getLocation();
-					l.setY(l.getY() + 3);
-
-					if (arena.contains(l)) {
-						if (players.size() > 1) {
-							players.remove(p);
-							p.sendMessage(ChatColor.RED + "You lost!");
-							broadcast(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + " is out!");
-						}
-					}
-					if (players.size() == 1 && players.contains(p)) {
-						plugin.getServer().broadcastMessage(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + " just won a round of spleef!");
-						players.remove(p);
-
-						arena.restore();
-					}
-				}
-			}
-		},0,20);
+		this.plugin.getServer().getScheduler().scheduleSyncRepeatingTask(
+            this.plugin,
+            new GameTask(this.plugin, this.arena, this),
+            0,
+            20
+        );
 
 		start();
 	}
 
 	public boolean hasPlayers() {
-		if (players.size() == 0) {
-			return false;
-		}
-
-		return true;
+		return !this.players.isEmpty();
 	}
 
 	public void start() {
-		arena.save();
+		this.arena.save();
 
 		ArrayList<String> list = new ArrayList<>();
-		for (Player player : plugin.getServer().getOnlinePlayers()) {
+		for (Player player : this.plugin.getServer().getOnlinePlayers()) {
 			Location l = player.getLocation();
 			l.setY(l.getY() - 2);
 
-			if (arena.contains(l)) {
-				players.add(player);
+			if (this.arena.contains(l)) {
+				this.players.add(player);
 				list.add(player.getDisplayName());
 			}
 		}
 
-		broadcast(ChatColor.GREEN + "The game has started! Players: " + ChatColor.WHITE + StringUtils.join(list,", "));
+		this.broadcast(ChatColor.GREEN + "The game has started! Players: " + ChatColor.WHITE + StringUtils.join(list, ", "));
 	}
 
 	public void stop() {
 		ArrayList<String> list = new ArrayList<>();
-		for (Player player : players) {
+		for (Player player : this.players) {
 			list.add(player.getDisplayName());
 		}
 
-		broadcast(ChatColor.RED + "The game was stopped! Remaining players: " + ChatColor.WHITE + StringUtils.join(list,", "));
+		this.broadcast(ChatColor.RED + "The game was stopped! Remaining players: " + ChatColor.WHITE + StringUtils.join(list, ", "));
 
-		arena.restore();
+		this.arena.restore();
 	}
 
 	public void broadcast(String msg) {
-		for (Player player : players) {
+		for (Player player : this.players) {
 			player.sendMessage(msg);
 		}
 	}
 
 	@EventHandler
 	public void onInteract(PlayerInteractEvent event) {
-		if (!players.contains(event.getPlayer())) {
+		if (!this.players.contains(event.getPlayer())) {
 			return;
 		}
 
@@ -107,7 +87,7 @@ public class Game implements Listener {
 			return;
 		}
 
-		if (!arena.contains(block.getLocation())) {
+		if (!this.arena.contains(block.getLocation())) {
 			return;
 		}
 
@@ -116,6 +96,6 @@ public class Game implements Listener {
 
 	@EventHandler
 	public void onDisconnect(PlayerQuitEvent event) {
-		players.remove(event.getPlayer());
+		this.players.remove(event.getPlayer());
 	}
 }

@@ -2,6 +2,7 @@ package no.jckf.spleef;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -9,42 +10,38 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Spleef extends JavaPlugin {
 	public WorldEditPlugin we;
-	private HashMap<String,Arena> arenas;
-	private HashMap<String,Game> games;
 
+	private final Map<String, Arena> arenas = new HashMap<>();
+	private final Map<String, Game> games = new HashMap<>();
+
+    @Override
 	public void onEnable() {
-		arenas = new HashMap<String,Arena>();
-		games = new HashMap<String,Game>();
-
 		PluginManager pm = getServer().getPluginManager();
 
-		we = (WorldEditPlugin) pm.getPlugin("WorldEdit");
+		this.we = (WorldEditPlugin) pm.getPlugin("WorldEdit");
 
-		if (we == null) {
-			getLogger().severe("Could not find WorldEdit!");
+		if (this.we == null) {
+			this.getLogger().severe("Could not find WorldEdit!");
 			pm.disablePlugin(this);
 			return;
 		}
 
-		loadData();
+		this.loadData();
 
-		getCommand("spleef").setExecutor(new Commands(this));
+		this.getCommand("spleef").setExecutor(new Commands(this));
 	}
 
-	public void onDisable() {
-		// Nothing to see here, people.
-	}
+	private void loadData() {
+		for (String name : this.getConfig().getConfigurationSection("arenas").getKeys(false)) {
+			String[] data = this.getConfig().getString(name).split("\\|");
 
-	public void loadData() {
-		for (String name : getConfig().getConfigurationSection("arenas").getKeys(false)) {
-			String[] data = getConfig().getString(name).split("\\|");
+			World world = this.getServer().getWorld(data[0]);
 
-			World world = getServer().getWorld(data[0]);
-
-			arenas.put(name,new Arena(
+			this.arenas.put(name, new Arena(
 				this,
 				world.getBlockAt(
 					Integer.parseInt(data[1]),
@@ -60,106 +57,108 @@ public class Spleef extends JavaPlugin {
 		}
 	}
 
-	public void saveData() {
-		for (String name : getConfig().getKeys(false)) {
-			getConfig().set(name,null);
+	private void saveData() {
+		for (String name : this.getConfig().getKeys(false)) {
+			this.getConfig().set(name, null);
 		}
 
-		for (String name : arenas.keySet()) {
-			getConfig().set("arenas." + name,
-				arenas.get(name).min.getWorld().getName() + "|" +
+		for (String name : this.arenas.keySet()) {
+            Arena arena = this.arenas.get(name);
 
-				arenas.get(name).min.getBlockX() + "|" +
-				arenas.get(name).min.getBlockY() + "|" +
-				arenas.get(name).min.getBlockZ() + "|" +
+			this.getConfig().set("arenas." + name,
+				arena.min.getWorld().getName() + "|" +
 
-				arenas.get(name).max.getBlockX() + "|" +
-				arenas.get(name).max.getBlockY() + "|" +
-				arenas.get(name).max.getBlockZ()
+				arena.min.getBlockX() + "|" +
+				arena.min.getBlockY() + "|" +
+				arena.min.getBlockZ() + "|" +
+
+				arena.max.getBlockX() + "|" +
+				arena.max.getBlockY() + "|" +
+				arena.max.getBlockZ()
 			);
 		}
 
-		saveConfig();
+		this.saveConfig();
 	}
 
-	public boolean arenaCreate(Player player,String name) {
-		Selection selection = we.getSelection(player);
+	public boolean arenaCreate(Player player, String name) {
+		Selection selection = this.we.getSelection(player);
 
 		if (selection == null) {
 			player.sendMessage(ChatColor.RED + "No selection made.");
 			return true;
 		}
 
-		if (arenas.containsKey(name)) {
+		if (this.arenas.containsKey(name)) {
 			player.sendMessage(ChatColor.RED + "Arena name already taken.");
 			return true;
 		}
 
-		arenas.put(name,new Arena(this,selection.getMinimumPoint(),selection.getMaximumPoint()));
+		this.arenas.put(name, new Arena(this, selection.getMinimumPoint(), selection.getMaximumPoint()));
 
-		saveData();
+		this.saveData();
 
 		player.sendMessage(ChatColor.GREEN + "Arena created.");
 
 		return true;
 	}
 
-	public boolean arenaDelete(Player player,String name) {
-		if (!arenas.containsKey(name)) {
+	public boolean arenaDelete(Player player, String name) {
+		if (!this.arenas.containsKey(name)) {
 			player.sendMessage(ChatColor.RED + "Given arena does not exist.");
 			return true;
 		}
 
-		arenas.remove(name);
+		this.arenas.remove(name);
 
-		saveData();
+		this.saveData();
 
 		player.sendMessage(ChatColor.GREEN + "Arena deleted.");
 
 		return true;
 	}
 
-	public boolean arenaStart(Player player,String name) {
-		if (!arenas.containsKey(name)) {
+	public boolean arenaStart(Player player, String name) {
+		if (!this.arenas.containsKey(name)) {
 			player.sendMessage(ChatColor.RED + "No such arena.");
 			return true;
 		}
 
-		if (games.containsKey(name)) {
-			if (games.get(name).hasPlayers()) {
+		if (this.games.containsKey(name)) {
+			if (this.games.get(name).hasPlayers()) {
 				player.sendMessage(ChatColor.RED + "There is already a game in progress here.");
 				return true;
 			} else {
-				games.remove(name);
+				this.games.remove(name);
 			}
 		}
 
-		Game game = new Game(this,arenas.get(name));
+		Game game = new Game(this, this.arenas.get(name));
 
 		if (!game.hasPlayers()) {
 			player.sendMessage(ChatColor.RED + "No players were added.");
 		} else {
-			games.put(name,game);
+			this.games.put(name,game);
 		}
 
 		return true;
 	}
 
-	public boolean arenaStop(Player player,String name) {
-		if (!arenas.containsKey(name)) {
+	public boolean arenaStop(Player player, String name) {
+		if (!this.arenas.containsKey(name)) {
 			player.sendMessage(ChatColor.RED + "No such arena.");
 			return true;
 		}
 
-		Game game = games.get(name);
+		Game game = this.games.get(name);
 
-		if (!games.containsKey(name) || !game.hasPlayers()) {
+		if (game == null || !game.hasPlayers()) {
 			player.sendMessage(ChatColor.RED + "No active game in that arena.");
 			return true;
 		}
 
 		game.stop();
-		games.remove(name);
+		this.games.remove(name);
 
 		player.sendMessage(ChatColor.GREEN + "Game stopped.");
 
@@ -167,12 +166,7 @@ public class Spleef extends JavaPlugin {
 	}
 
 	public boolean arenaList(Player player) {
-		String list = "";
-		for (String name : arenas.keySet()) {
-			list += name + ", ";
-		}
-
-		player.sendMessage(ChatColor.GREEN + "Arena list: " + ChatColor.WHITE + list.substring(0,Math.max(0,list.length() - 2)));
+		player.sendMessage(ChatColor.GREEN + "Arena list: " + ChatColor.WHITE + StringUtils.join(this.arenas.keySet(), ", "));
 
 		return true;
 	}

@@ -9,11 +9,11 @@ import org.bukkit.entity.Player;
 public class Commands implements CommandExecutor {
 	private final Spleef plugin;
 
-	public Commands(Spleef _plugin) {
-		plugin = _plugin;
+	public Commands(Spleef plugin) {
+		this.plugin = plugin;
 	}
 
-	public boolean onCommand(CommandSender sender,Command command,String label,String[] args) {
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (!(sender instanceof Player)) {
 			sender.sendMessage("This command can only be used in-game.");
 			return true;

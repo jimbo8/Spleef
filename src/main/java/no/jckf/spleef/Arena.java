@@ -1,7 +1,6 @@
 package no.jckf.spleef;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -10,17 +9,18 @@ import java.util.HashMap;
 
 public class Arena {
 	private final Spleef plugin;
-	public Location min;
-	public Location max;
 
-	private HashMap<Location,BlockState> snapshot;
+	public final Location min;
+	public final Location max;
 
-	public Arena(Spleef _plugin,Location _min,Location _max) {
-		plugin = _plugin;
-		min = _min;
-		max = _max;
+	private HashMap<Location, BlockState> snapshot;
 
-		snapshot = new HashMap<Location,BlockState>();
+	public Arena(Spleef plugin, Location min, Location max) {
+		this.plugin = plugin;
+		this.min = min;
+		this.max = max;
+
+		this.snapshot = new HashMap<>();
 	}
 
 	public boolean contains(Location l) {
