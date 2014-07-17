@@ -29,12 +29,12 @@ public class GameTask implements Runnable {
             if (this.arena.contains(l)) {
                 if (this.game.players.size() > 1) {
                     this.game.players.remove(p);
-                    p.sendMessage(ChatColor.RED + "You lost!");
-                    this.game.broadcast(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + " is out!");
+                    p.sendMessage(ChatColor.RED + this.plugin.lang.getString("game.lost"));
+                    this.game.broadcast(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + this.plugin.lang.getString("game.out"));
                 }
             }
             if (this.game.players.size() == 1 && this.game.players.contains(p)) {
-                this.plugin.getServer().broadcastMessage(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + " just won a round of spleef!");
+                this.plugin.getServer().broadcastMessage(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + this.plugin.lang.getString("game.won"));
                 this.game.players.remove(p);
 
                 this.arena.restore();

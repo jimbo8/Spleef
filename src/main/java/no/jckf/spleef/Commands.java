@@ -33,28 +33,28 @@ public class Commands implements CommandExecutor {
 		switch (args[0].toLowerCase()) {
 			case "create":
 				if (args.length < 2) {
-					player.sendMessage(ChatColor.RED + "Missing arena name.");
+					player.sendMessage(ChatColor.RED + this.plugin.lang.getString("onCommand.argsLength"));
 					return false;
 				}
 				return plugin.arenaCreate(player,args[1]);
 
 			case "delete":
 				if (args.length < 2) {
-					player.sendMessage(ChatColor.RED + "Missing arena name.");
+					player.sendMessage(ChatColor.RED + this.plugin.lang.getString("onCommand.argsLength"));
 					return false;
 				}
 				return plugin.arenaDelete(player,args[1]);
 
 			case "start":
 				if (args.length < 2) {
-					player.sendMessage(ChatColor.RED + "Missing arena name.");
+					player.sendMessage(ChatColor.RED + this.plugin.lang.getString("onCommand.argsLength"));
 					return false;
 				}
 				return plugin.arenaStart(player,args[1]);
 
 			case "stop":
 				if (args.length < 2) {
-					player.sendMessage(ChatColor.RED + "Missing arena name.");
+					player.sendMessage(ChatColor.RED + this.plugin.lang.getString("onCommand.argsLength"));
 					return false;
 				}
 				return plugin.arenaStop(player,args[1]);

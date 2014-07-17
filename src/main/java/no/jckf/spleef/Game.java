@@ -55,7 +55,10 @@ public class Game implements Listener {
 			}
 		}
 
-		this.broadcast(ChatColor.GREEN + "The game has started! Players: " + ChatColor.WHITE + StringUtils.join(list, ", "));
+		this.broadcast(
+            ChatColor.GREEN + this.plugin.lang.getString("arenaStart.broadcast.prefix") +
+            ChatColor.WHITE + StringUtils.join(list, this.plugin.lang.getString("arenaStart.broadcast.separator"))
+        );
 	}
 
 	public void stop() {
@@ -64,7 +67,9 @@ public class Game implements Listener {
 			list.add(player.getDisplayName());
 		}
 
-		this.broadcast(ChatColor.RED + "The game was stopped! Remaining players: " + ChatColor.WHITE + StringUtils.join(list, ", "));
+		this.broadcast(
+            ChatColor.RED + this.plugin.lang.getString("arenaStop.broadcast.prefix") +
+            ChatColor.WHITE + StringUtils.join(list, this.plugin.lang.getString("arenaStop.broadcast.separator")));
 
 		this.arena.restore();
 	}

@@ -1,0 +1,36 @@
+arenaCreate:
+  selectionNull: No selection made.
+  containsKey: Arena name already taken.
+  okay: Arena created.
+
+arenaDelete:
+  notContainsKey: Given arena does not exist.
+  okay: Arena deleted.
+
+arenaStart:
+  notContainsKey: No such arena.
+  containsKey: There is already a game in progress here.
+  notHasPlayers: No players added.
+  broadcast:
+    prefix: "The game has started! Players: "
+    separator: ", "
+
+arenaStop:
+  notContainsKey: No such arena.
+  notHasPlayers: No active game in that arena.
+  okay: Game stopped.
+  broadcast:
+    prefix: "The game was stopped! Remaining players: "
+    separator: ", "
+
+arenaList:
+  prefix: "Arena list: "
+  separator: ", "
+
+onCommand:
+  argsLength: Missing arena name.
+
+game:
+  lost: You lost!
+  out: " is out!"
+  won: " just won a game of spleef!"

@@ -2,18 +2,23 @@ package no.jckf.spleef;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldedit.util.YAMLConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Spleef extends JavaPlugin {
 	public WorldEditPlugin we;
+
+    YamlConfiguration lang;
 
 	private final Map<String, Arena> arenas = new HashMap<>();
 	private final Map<String, Game> games = new HashMap<>();
@@ -31,6 +36,15 @@ public class Spleef extends JavaPlugin {
 		}
 
         this.saveDefaultConfig();
+
+        File langFile = new File(this.getDataFolder(), this.getConfig().getString("language") + ".yml");
+
+        if (!langFile.exists()) {
+            this.getLogger().warning("Localization file for " + this.getConfig().getString("language") + " could not be found. Defaulting to English.");
+            langFile = new File(this.getDataFolder(), "english.yml");
+        }
+
+        this.lang = YamlConfiguration.loadConfiguration(langFile);
 
 		this.loadData();
 
@@ -85,12 +99,12 @@ public class Spleef extends JavaPlugin {
 		Selection selection = this.we.getSelection(player);
 
 		if (selection == null) {
-			player.sendMessage(ChatColor.RED + "No selection made.");
+			player.sendMessage(ChatColor.RED + this.lang.getString("arenaCreate.selectionNull"));
 			return true;
 		}
 
 		if (this.arenas.containsKey(name)) {
-			player.sendMessage(ChatColor.RED + "Arena name already taken.");
+			player.sendMessage(ChatColor.RED + this.lang.getString("arenaCreate.containsKey"));
 			return true;
 		}
 
@@ -98,14 +112,14 @@ public class Spleef extends JavaPlugin {
 
 		this.saveData();
 
-		player.sendMessage(ChatColor.GREEN + "Arena created.");
+		player.sendMessage(ChatColor.GREEN + this.lang.getString("arenaCreate.okay"));
 
 		return true;
 	}
 
 	public boolean arenaDelete(Player player, String name) {
 		if (!this.arenas.containsKey(name)) {
-			player.sendMessage(ChatColor.RED + "Given arena does not exist.");
+			player.sendMessage(ChatColor.RED + this.lang.getString("arenaDelete.notContainsKey"));
 			return true;
 		}
 
@@ -113,20 +127,20 @@ public class Spleef extends JavaPlugin {
 
 		this.saveData();
 
-		player.sendMessage(ChatColor.GREEN + "Arena deleted.");
+		player.sendMessage(ChatColor.GREEN + this.lang.getString("arenaDelete.okay"));
 
 		return true;
 	}
 
 	public boolean arenaStart(Player player, String name) {
 		if (!this.arenas.containsKey(name)) {
-			player.sendMessage(ChatColor.RED + "No such arena.");
+			player.sendMessage(ChatColor.RED + this.lang.getString("arenaStart.notContainsKey"));
 			return true;
 		}
 
 		if (this.games.containsKey(name)) {
 			if (this.games.get(name).hasPlayers()) {
-				player.sendMessage(ChatColor.RED + "There is already a game in progress here.");
+				player.sendMessage(ChatColor.RED + this.lang.getString("arenaStart.containsKey"));
 				return true;
 			} else {
 				this.games.remove(name);
@@ -136,7 +150,7 @@ public class Spleef extends JavaPlugin {
 		Game game = new Game(this, this.arenas.get(name));
 
 		if (!game.hasPlayers()) {
-			player.sendMessage(ChatColor.RED + "No players were added.");
+			player.sendMessage(ChatColor.RED + this.lang.getString("arenaStart.notHasPlayers"));
 		} else {
 			this.games.put(name,game);
 		}
@@ -146,27 +160,30 @@ public class Spleef extends JavaPlugin {
 
 	public boolean arenaStop(Player player, String name) {
 		if (!this.arenas.containsKey(name)) {
-			player.sendMessage(ChatColor.RED + "No such arena.");
+			player.sendMessage(ChatColor.RED + this.lang.getString("arenaStop.notContainsKey"));
 			return true;
 		}
 
 		Game game = this.games.get(name);
 
 		if (game == null || !game.hasPlayers()) {
-			player.sendMessage(ChatColor.RED + "No active game in that arena.");
+			player.sendMessage(ChatColor.RED + this.lang.getString("arenaStop.notHasPlayers"));
 			return true;
 		}
 
 		game.stop();
 		this.games.remove(name);
 
-		player.sendMessage(ChatColor.GREEN + "Game stopped.");
+		player.sendMessage(ChatColor.GREEN + this.lang.getString("arenaStop.okay"));
 
 		return true;
 	}
 
 	public boolean arenaList(Player player) {
-		player.sendMessage(ChatColor.GREEN + "Arena list: " + ChatColor.WHITE + StringUtils.join(this.arenas.keySet(), ", "));
+		player.sendMessage(
+            ChatColor.GREEN + this.lang.getString("arenaList.prefix") +
+            ChatColor.WHITE + StringUtils.join(this.arenas.keySet(), this.lang.getString("arenaList.separator"))
+        );
 
 		return true;
 	}
