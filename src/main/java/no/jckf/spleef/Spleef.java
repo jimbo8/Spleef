@@ -152,7 +152,7 @@ public class Spleef extends JavaPlugin {
 		if (!game.hasPlayers()) {
 			player.sendMessage(ChatColor.RED + this.lang.getString("arenaStart.notHasPlayers"));
 		} else {
-			this.games.put(name,game);
+			this.games.put(name, game);
 		}
 
 		return true;
