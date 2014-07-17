@@ -58,9 +58,7 @@ public class Spleef extends JavaPlugin {
 	}
 
 	private void saveData() {
-		for (String name : this.getConfig().getKeys(false)) {
-			this.getConfig().set(name, null);
-		}
+		this.getConfig().set("arenas", null);
 
 		for (String name : this.arenas.keySet()) {
             Arena arena = this.arenas.get(name);
