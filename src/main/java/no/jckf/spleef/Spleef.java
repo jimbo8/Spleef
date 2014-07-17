@@ -39,7 +39,7 @@ public class Spleef extends JavaPlugin {
 	}
 
 	public void loadData() {
-		for (String name : getConfig().getKeys(false)) {
+		for (String name : getConfig().getConfigurationSection("arenas").getKeys(false)) {
 			String[] data = getConfig().getString(name).split("\\|");
 
 			World world = getServer().getWorld(data[0]);
@@ -66,7 +66,7 @@ public class Spleef extends JavaPlugin {
 		}
 
 		for (String name : arenas.keySet()) {
-			getConfig().set(name,
+			getConfig().set("arenas." + name,
 				arenas.get(name).min.getWorld().getName() + "|" +
 
 				arenas.get(name).min.getBlockX() + "|" +
