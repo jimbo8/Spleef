@@ -5,6 +5,7 @@ import com.sk89q.worldedit.bukkit.selections.Selection;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -51,8 +52,13 @@ public class Spleef extends JavaPlugin {
 	}
 
 	private void loadData() {
-		for (String name : this.getConfig().getConfigurationSection("arenas").getKeys(false)) {
-			String[] data = this.getConfig().getString(name).split("\\|");
+        ConfigurationSection section = this.getConfig().getConfigurationSection("arenas");
+
+        if (section == null || section.getKeys(false).isEmpty())
+            return;
+
+		for (String name : section.getKeys(false)) {
+			String[] data = section.getString(name).split("\\|");
 
 			World world = this.getServer().getWorld(data[0]);
 
