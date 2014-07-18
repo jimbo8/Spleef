@@ -9,7 +9,7 @@
     <properties>
         <jdk>1.7</jdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <main.class>on.jckf.spleef.Spleef</main.class>
+        <main.class>no.jckf.spleef.Spleef</main.class>
     </properties>
 
     <developers>
