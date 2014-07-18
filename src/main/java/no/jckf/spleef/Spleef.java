@@ -12,6 +12,9 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,8 +43,12 @@ public class Spleef extends JavaPlugin {
         File langFile = new File(this.getDataFolder(), this.getConfig().getString("language") + ".yml");
 
         if (!langFile.exists()) {
-            this.getLogger().warning("Localization file for " + this.getConfig().getString("language") + " could not be found. Defaulting to English.");
-            langFile = new File(this.getDataFolder(), "english.yml");
+            this.copyStreamToFile(this.getResource(this.getConfig().getString("language") + ".yml"), langFile);
+
+            if (!langFile.exists()) {
+                this.getLogger().warning("Localization file for \"" + this.getConfig().getString("language") + "\" could not be found. Defaulting to English.");
+                langFile = new File(this.getDataFolder(), "english.yml");
+            }
         }
 
         this.lang = YamlConfiguration.loadConfiguration(langFile);
@@ -50,6 +57,19 @@ public class Spleef extends JavaPlugin {
 
 		this.getCommand("spleef").setExecutor(new Commands(this));
 	}
+
+    private void copyStreamToFile(InputStream in, File file) {
+        try {
+            OutputStream out = new FileOutputStream(file);
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0){
+                out.write(buf, 0, len);
+            }
+            out.close();
+            in.close();
+        } catch (Exception ignored) { }
+    }
 
 	private void loadData() {
         ConfigurationSection section = this.getConfig().getConfigurationSection("arenas");
