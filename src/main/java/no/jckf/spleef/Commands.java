@@ -25,10 +25,16 @@ public class Commands implements CommandExecutor {
 		if (!player.isOp()) {
 			return true;
 		}
+        if(plugin.hwEnabled){
+            if (args.length == 0 || args.length > 3) {
+                return false;
+            }
+        }else{
+            if (args.length == 0 || args.length > 2) {
+                return false;
+            }
+        }
 
-		if (args.length == 0 || args.length > 2) {
-			return false;
-		}
 
 		switch (args[0].toLowerCase()) {
 			case "create":
@@ -46,12 +52,33 @@ public class Commands implements CommandExecutor {
 				return plugin.arenaDelete(player,args[1]);
 
 			case "start":
-				if (args.length < 2) {
-					player.sendMessage(ChatColor.RED + this.plugin.lang.getString("onCommand.argsLength"));
-					return false;
-				}
-				return plugin.arenaStart(player,args[1]);
-
+            if(plugin.hwEnabled){
+                if (args.length < 3) {
+                    player.sendMessage(ChatColor.RED + this.plugin.lang.getString("onCommand.argsLength"));
+                    return false;
+                }
+                if(plugin.isInt(args[2])) {
+                    GameTask.am = Integer.parseInt(args[2]);
+                    if (plugin.hw.getBankHandler().getAmount(player) > Integer.parseInt(args[2])) {
+                        //plugin.amount.add(Game.am);
+                        plugin.hw.getBankHandler().removeAmount(player, Integer.parseInt(args[2]));
+                        System.out.println(player.getName() + " la til " + Integer.parseInt(args[2]) + " til spleef-potten");
+                        return plugin.arenaStart(player, args[1]);
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Du har ikke nok gull.");
+                        return false;
+                    }
+                }else{
+                    player.sendMessage(ChatColor.RED + "Du må skrive et tall - bokstaver gjelder ikke!");
+                    return false;
+                }
+            }else {
+                if (args.length < 2) {
+                    player.sendMessage(ChatColor.RED + plugin.lang.getString("onCommand.argsLength"));
+                    return false;
+                }
+                return plugin.arenaStart(player, args[1]);
+            }
 			case "stop":
 				if (args.length < 2) {
 					player.sendMessage(ChatColor.RED + this.plugin.lang.getString("onCommand.argsLength"));

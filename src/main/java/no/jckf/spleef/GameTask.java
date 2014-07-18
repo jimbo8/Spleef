@@ -8,7 +8,7 @@ import java.util.List;
 
 public class GameTask implements Runnable {
     private final Spleef plugin;
-
+    public static int am = 0;
     private final Arena arena;
     private final Game game;
 
@@ -35,6 +35,11 @@ public class GameTask implements Runnable {
             }
             if (this.game.players.size() == 1 && this.game.players.contains(p)) {
                 this.plugin.getServer().broadcastMessage(ChatColor.GREEN + p.getDisplayName() + ChatColor.GREEN + this.plugin.lang.getString("game.won"));
+                if(plugin.hwEnabled) {
+                    plugin.hw.getBankHandler().insertAmount(p, am);
+                    plugin.getServer().broadcastMessage(ChatColor.GREEN + "Som også vant " + ChatColor.WHITE + am + ChatColor.GREEN + " gull!");
+                    am = 0;
+                }
                 this.game.players.remove(p);
 
                 this.arena.restore();

@@ -59,6 +59,9 @@ public class Game implements Listener {
             ChatColor.GREEN + this.plugin.lang.getString("arenaStart.broadcast.prefix") +
             ChatColor.WHITE + StringUtils.join(list, this.plugin.lang.getString("arenaStart.broadcast.separator"))
         );
+        if(plugin.hwEnabled) {
+            this.broadcast(ChatColor.GREEN + "Antall gull: " + ChatColor.WHITE + GameTask.am);
+        }
 	}
 
 	public void stop() {

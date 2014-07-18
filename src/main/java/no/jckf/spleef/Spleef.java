@@ -2,6 +2,7 @@ package no.jckf.spleef;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
+import no.minecraft.Minecraftno.Minecraftno;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -20,7 +21,8 @@ import java.util.Map;
 
 public class Spleef extends JavaPlugin {
 	public WorldEditPlugin we;
-
+    public Minecraftno hw;
+    public boolean hwEnabled = false;
     YamlConfiguration lang;
 
 	private final Map<String, Arena> arenas = new HashMap<>();
@@ -37,7 +39,11 @@ public class Spleef extends JavaPlugin {
 			pm.disablePlugin(this);
 			return;
 		}
-
+        this.hw = (Minecraftno) pm.getPlugin("Minecraftno");
+        if(hw != null){
+            hwEnabled = true;
+            System.out.println("Hardwork detected.");
+        }
         this.saveDefaultConfig();
 
         File langFile = new File(this.getDataFolder(), this.getConfig().getString("language") + ".yml");
@@ -212,4 +218,12 @@ public class Spleef extends JavaPlugin {
 
 		return true;
 	}
+    public boolean isInt(String s){
+        try{
+            Integer.parseInt(s);
+        }catch(NumberFormatException nfe){
+            return false;
+        }
+        return true;
+    }
 }
